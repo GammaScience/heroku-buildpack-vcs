@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+# -----------------------------------------------------------------------------
+# A heroku buildpack for initialising git from environment variables
+# -----------------------------------------------------------------------------
+
+# fail fast
+set -eo pipefail
+
+# debug
+# set -x
+
+function topic() {
+  echo "-----> $*"
+}
+
+ENV_DIR=$3
+BUILD_DIR=$1
+
+cat <<EOF >"$BUILD_DIR/.gitconfig"
+[init]
+	templatedir = \$HOME/.apt/usr/share/git-core/templates/
+
+EOF
+
+topic "Writing profile script"
+mkdir -p "$BUILD_DIR/.profile.d"
+cat <<EOF >"$BUILD_DIR/.profile.d/000_git.sh"
+export GIT_EXEC_PATH="\$HOME/.apt/usr/lib/git-core"
+EOF
